@@ -1,0 +1,15 @@
+{
+    "entries": [
+        {
+            "name": "LUIS",
+            "aliases": [
+                "Luis",
+                "Pacheco"
+            ],
+            "category": "Oficina",
+            "center": "Centro",
+            "extension": null,
+            "phoneNumber": "601234578"
+        }
+    ]
+}

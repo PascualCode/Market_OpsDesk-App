@@ -1,0 +1,173 @@
+{
+    "apiStreamUrl": "http://10.0.0.210:5055/api/tools/chat/stream",
+    "apiHealthUrl": "http://10.0.0.210:5055/health",
+
+    "apiDueRemindersUrl": "http://10.0.0.210:5055/api/reminders/due",
+    "apiMarkReminderNotifiedUrl": "http://10.0.0.210:5055/api/reminders/mark-notified",
+
+    "apiPendingLocalActionsUrl": "http://10.0.0.210:5055/api/local-actions/pending",
+    "apiCompleteLocalActionUrl": "http://10.0.0.210:5055/api/local-actions/complete",
+    "localActionsPollingSeconds": 10,
+
+    "assistantName": "Asistente ",
+    "model": "",
+    "maxHistoryMessages": 6,
+    "startWithWindows": true,
+    "reminderPollingSeconds": 60,
+    "posterGenerator": {
+        "enabled": true,
+        "apiGeneratePosterUrl": "http://10.0.0.210:5055/api/posters/generate",
+        "apiGeneratePosterBatchUrl": "http://10.0.0.210:5055/api/posters/generate-batch",
+        "apiSearchProductsUrl": "http://10.0.0.210:5055/api/posters/products/search",
+        "apiPendingLabelsUrl": "http://10.0.0.210:5055/api/labels/pending",
+        "apiGenerateLabelsUrl": "http://10.0.0.210:5055/api/labels/generate",
+        "apiSearchLabelsUrl": "http://10.0.0.210:5055/api/labels/search",
+        "apiMarkLabelsAsPrintedUrl": "http://10.0.0.210:5055/api/labels/mark-printed",
+        "tempFolderName": "Asistente\\Carteles"
+    },
+  "desktopTasks": {
+    "enabled": true,
+    "apiDesktopTasksUrl": "http://10.0.0.210:5055/api/desktop-tasks",
+    "apiVisibleDesktopTasksUrl": "http://10.0.0.210:5055/api/desktop-tasks/visible",
+    "apiDesktopTaskGroupsUrl": "http://10.0.0.210:5055/api/desktop-tasks/groups",
+    "apiDeleteDesktopTasksUrl": "http://10.0.0.210:5055/api/desktop-tasks/delete",
+    "apiPostponeDesktopTaskUrl": "http://10.0.0.210:5055/api/desktop-tasks/postpone",
+    "apiUpdateDesktopTaskDescriptionUrl": "http://10.0.0.210:5055/api/desktop-tasks/update-description",
+    "apiUploadDesktopTaskAttachmentUrl": "http://10.0.0.210:5055/api/desktop-tasks/attachments/upload",
+    "apiDownloadDesktopTaskAttachmentUrl": "http://10.0.0.210:5055/api/desktop-tasks/attachments/download",
+    "apiDeleteDesktopTaskAttachmentUrl": "http://10.0.0.210:5055/api/desktop-tasks/attachments/delete"
+  },
+    "quickPrint": {
+        "enabled": true,
+        "allowedExtensions": [
+            ".pdf",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".docx",
+            ".doc",
+            ".xlsx",
+            ".xls"
+        ],
+        "adobeReaderExecutablePath": "",
+        "closeAdobeAfterPrint": true,
+        "closeAdobeAfterPrintSeconds": 20,
+        "maxBatchFiles": 10
+    },
+    "allowedPrograms": [
+        {
+            "displayName": "Bloc de notas",
+            "aliases": [
+                "bloc de notas",
+                "notepad"
+            ],
+            "processNames": [
+                "notepad"
+            ]
+        },
+        {
+            "displayName": "Microsoft Edge",
+            "aliases": [
+                "edge",
+                "microsoft edge",
+                "navegador edge",
+                "edge explorer",
+                "explorer edge"
+            ],
+            "processNames": [
+                "msedge"
+            ]
+        },
+        {
+            "displayName": "Google Chrome",
+            "aliases": [
+                "chrome",
+                "google chrome",
+                "navegador chrome"
+            ],
+            "processNames": [
+                "chrome"
+            ]
+        },
+        {
+            "displayName": "Microsoft Excel",
+            "aliases": [
+                "excel",
+                "microsoft excel",
+                "hoja de cálculo"
+            ],
+            "processNames": [
+                "excel"
+            ]
+        },
+        {
+            "displayName": "Microsoft Word",
+            "aliases": [
+                "word",
+                "microsoft word",
+                "documento word"
+            ],
+            "processNames": [
+                "winword"
+            ]
+        },
+        {
+            "displayName": "Exact Dimoni 7",
+            "aliases": [
+                "exact",
+                "dimoni",
+                "exact dimoni"
+            ],
+            "processNames": [
+                "smenv01a"
+            ]
+        },
+        {
+            "displayName": "Adobe Acrobat Reader",
+            "aliases": [
+                "adobe",
+                "acrobat",
+                "acrobat reader",
+                "lector pdf"
+            ],
+            "processNames": [
+                "acrord32"
+            ]
+        }
+
+    ],
+    "allowedOpenPrograms": [
+        {
+            "displayName": "Bloc de notas",
+            "aliases": [
+                "bloc de notas",
+                "notepad"
+            ],
+            "executablePath": "notepad.exe"
+        },
+        {
+            "displayName": "Microsoft Edge",
+            "aliases": [
+                "edge",
+                "microsoft edge",
+                "navegador edge",
+                "edge explorer",
+                "explorer edge"
+            ],
+            "executablePath": "msedge.exe"
+        }
+    ],
+    "allowedFolders": [
+        {
+            "displayName": "Mi carpeta compartida",
+            "aliases": [
+                "mi carpeta compartida",
+                "carpeta compartida",
+                "mi carpeta de la nas",
+                "mi carpeta",
+                "carpeta de la nas"
+            ],
+            "folderPath": ""
+        }
+    ]
+}

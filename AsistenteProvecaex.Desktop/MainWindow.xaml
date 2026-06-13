@@ -1,0 +1,2166 @@
+<Window x:Class="Asistente.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Asistente "
+        Icon="Assets/avatar.ico"
+        Width="920"
+        Height="900"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Loaded="Window_Loaded"
+        Closed="Window_Closed">
+
+    <Window.Resources>
+
+        <!-- Estilo base para botones principales -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="86"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Estilo para botones secundarios -->
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Background" Value="#E5E7EB"/>
+            <Setter Property="Foreground" Value="#111827"/>
+        </Style>
+
+        <!-- Estilo para botón de cancelar -->
+        <Style x:Key="CancelButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Background" Value="#F97316"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- Botón flotante secundario junto al avatar -->
+        <Style x:Key="FloatingCircleButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="54"/>
+            <Setter Property="Height" Value="54"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#1F2937"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="28">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="18"
+                                          ShadowDepth="4"
+                                          Opacity="0.22"/>
+                            </Border.Effect>
+
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Animación de apertura del panel de chat -->
+        <Storyboard x:Key="OpenChatStoryboard">
+            <DoubleAnimation Storyboard.TargetName="ChatPanel"
+                     Storyboard.TargetProperty="Opacity"
+                     From="0"
+                     To="1"
+                     Duration="0:0:0.18"/>
+
+            <DoubleAnimation Storyboard.TargetName="ChatPanelScale"
+                     Storyboard.TargetProperty="ScaleX"
+                     From="0.92"
+                     To="1"
+                     Duration="0:0:0.18"/>
+
+            <DoubleAnimation Storyboard.TargetName="ChatPanelScale"
+                     Storyboard.TargetProperty="ScaleY"
+                     From="0.92"
+                     To="1"
+                     Duration="0:0:0.18"/>
+        </Storyboard>
+
+        <!-- Animación de cierre del panel de chat -->
+        <Storyboard x:Key="CloseChatStoryboard">
+            <DoubleAnimation Storyboard.TargetName="ChatPanel"
+                     Storyboard.TargetProperty="Opacity"
+                     From="1"
+                     To="0"
+                     Duration="0:0:0.14"/>
+
+            <DoubleAnimation Storyboard.TargetName="ChatPanelScale"
+                     Storyboard.TargetProperty="ScaleX"
+                     From="1"
+                     To="0.92"
+                     Duration="0:0:0.14"/>
+
+            <DoubleAnimation Storyboard.TargetName="ChatPanelScale"
+                     Storyboard.TargetProperty="ScaleY"
+                     From="1"
+                     To="0.92"
+                     Duration="0:0:0.14"/>
+        </Storyboard>
+
+        <!-- Animación de apertura del panel de impresión rápida -->
+        <Storyboard x:Key="OpenQuickPrintStoryboard">
+            <DoubleAnimation Storyboard.TargetName="QuickPrintPanel"
+                     Storyboard.TargetProperty="Opacity"
+                     From="0"
+                     To="1"
+                     Duration="0:0:0.18"/>
+
+            <DoubleAnimation Storyboard.TargetName="QuickPrintPanelScale"
+                     Storyboard.TargetProperty="ScaleX"
+                     From="0.92"
+                     To="1"
+                     Duration="0:0:0.18"/>
+
+            <DoubleAnimation Storyboard.TargetName="QuickPrintPanelScale"
+                     Storyboard.TargetProperty="ScaleY"
+                     From="0.92"
+                     To="1"
+                     Duration="0:0:0.18"/>
+        </Storyboard>
+
+        <!-- Animación de cierre del panel de impresión rápida -->
+        <Storyboard x:Key="CloseQuickPrintStoryboard">
+            <DoubleAnimation Storyboard.TargetName="QuickPrintPanel"
+                     Storyboard.TargetProperty="Opacity"
+                     From="1"
+                     To="0"
+                     Duration="0:0:0.14"/>
+
+            <DoubleAnimation Storyboard.TargetName="QuickPrintPanelScale"
+                     Storyboard.TargetProperty="ScaleX"
+                     From="1"
+                     To="0.92"
+                     Duration="0:0:0.14"/>
+
+            <DoubleAnimation Storyboard.TargetName="QuickPrintPanelScale"
+                     Storyboard.TargetProperty="ScaleY"
+                     From="1"
+                     To="0.92"
+                     Duration="0:0:0.14"/>
+        </Storyboard>
+
+        <!-- Animación de apertura del panel de carteles -->
+        <Storyboard x:Key="OpenPosterPanelStoryboard">
+            <DoubleAnimation Storyboard.TargetName="PosterPanel"
+                     Storyboard.TargetProperty="Opacity"
+                     From="0"
+                     To="1"
+                     Duration="0:0:0.18"/>
+
+            <DoubleAnimation Storyboard.TargetName="PosterPanelScale"
+                     Storyboard.TargetProperty="ScaleX"
+                     From="0.92"
+                     To="1"
+                     Duration="0:0:0.18"/>
+
+            <DoubleAnimation Storyboard.TargetName="PosterPanelScale"
+                     Storyboard.TargetProperty="ScaleY"
+                     From="0.92"
+                     To="1"
+                     Duration="0:0:0.18"/>
+        </Storyboard>
+
+        <!-- Animación de cierre del panel de carteles -->
+        <Storyboard x:Key="ClosePosterPanelStoryboard">
+            <DoubleAnimation Storyboard.TargetName="PosterPanel"
+                     Storyboard.TargetProperty="Opacity"
+                     From="1"
+                     To="0"
+                     Duration="0:0:0.14"/>
+
+            <DoubleAnimation Storyboard.TargetName="PosterPanelScale"
+                     Storyboard.TargetProperty="ScaleX"
+                     From="1"
+                     To="0.92"
+                     Duration="0:0:0.14"/>
+
+            <DoubleAnimation Storyboard.TargetName="PosterPanelScale"
+                     Storyboard.TargetProperty="ScaleY"
+                     From="1"
+                     To="0.92"
+                     Duration="0:0:0.14"/>
+        </Storyboard>
+
+        <Style x:Key="PosterGreenHoverButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource SecondaryButtonStyle}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#16A34A"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="BorderBrush" Value="#15803D"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PosterPrintHoverButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1D4ED8"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="BorderBrush" Value="#1E40AF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Margin="0,-60,0,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="237*"/>
+            <ColumnDefinition Width="223*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Panel principal del chat -->
+        <Border x:Name="ChatPanel"
+                Width="440"
+                Height="500"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="442,180,0,0"
+                Background="#FAFFFFFF"
+                CornerRadius="26"
+                BorderBrush="#D1D5DB"
+                BorderThickness="1"
+                Padding="18"
+                Opacity="0"
+                RenderTransformOrigin="0.5,1"
+                Visibility="Collapsed" Grid.ColumnSpan="2">
+
+            <Border.RenderTransform>
+                <ScaleTransform x:Name="ChatPanelScale"
+                    ScaleX="0.92"
+                    ScaleY="0.92"/>
+            </Border.RenderTransform>
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24"
+                                  ShadowDepth="6"
+                                  Opacity="0.25"/>
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Cabecera -->
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Mini avatar en cabecera -->
+                    <Border Grid.Column="0"
+                            Width="42"
+                            Height="42"
+                            Background="#EFF6FF"
+                            CornerRadius="21"
+                            BorderBrush="#BFDBFE"
+                            BorderThickness="1"
+                            Margin="0,0,10,0">
+                        <Image Source="/Assets/avatar.png"
+                               Stretch="Uniform"
+                               Margin="5"/>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock x:Name="TitleText"
+                                   Text="Asistente "
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="#111827"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <Ellipse x:Name="StatusIndicator"
+                                     Width="8"
+                                     Height="8"
+                                     Fill="#22C55E"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,6,0"/>
+
+                            <TextBlock x:Name="StatusText"
+                                       Text="Listo para ayudarte."
+                                       FontSize="12"
+                                       Foreground="#6B7280"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button Grid.Column="2"
+                            Content="×"
+                            Width="34"
+                            Height="34"
+                            Background="#F3F4F6"
+                            Foreground="#111827"
+                            BorderThickness="0"
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Cursor="Hand"
+                            Click="HideChat_Click"/>
+                </Grid>
+
+                <!-- Línea separadora -->
+                <Border Grid.Row="1"
+                        Height="1"
+                        Background="#E5E7EB"
+                        Margin="0,0,0,12"/>
+
+                <!-- Zona de respuesta -->
+                <Border Grid.Row="2"
+                        Background="#F9FAFB"
+                        CornerRadius="16"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1"
+                        Padding="12">
+
+                    <ScrollViewer x:Name="ResponseScroll"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Background="Transparent">
+                        <TextBlock x:Name="ResponseText"
+                                   TextWrapping="Wrap"
+                                   FontSize="14"
+                                   Foreground="#1F2937"
+                                   LineHeight="22"/>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Entrada de texto y botones -->
+                <Grid Grid.Row="3" Margin="0,14,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            Background="#FFFFFF"
+                            CornerRadius="14"
+                            BorderBrush="#D1D5DB"
+                            BorderThickness="1"
+                            Padding="0">
+                        <TextBox x:Name="QuestionBox"
+                                 Height="42"
+                                 FontSize="14"
+                                 VerticalContentAlignment="Center"
+                                 Padding="12,0"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 Foreground="#111827"
+                                 KeyDown="QuestionBox_KeyDown"/>
+                    </Border>
+
+                    <Grid Grid.Row="1" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   Text="Pulsa Enter para enviar"
+                                   FontSize="11"
+                                   Foreground="#9CA3AF"
+                                   VerticalAlignment="Center"/>
+
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+
+                            <Button Content="Limpiar"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    Click="ClearButton_Click"/>
+
+                            <Button x:Name="CancelButton"
+                                    Content="Cancelar"
+                                    Style="{StaticResource CancelButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    IsEnabled="False"
+                                    Click="CancelButton_Click"/>
+
+                            <Button x:Name="SendButton"
+                                    Content="Enviar"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Click="SendButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Panel desplegable de impresión rápida -->
+        <Border x:Name="QuickPrintPanel"
+        Width="390"
+        Height="330"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Margin="0,0,143,168"
+        Background="#FAFFFFFF"
+        CornerRadius="24"
+        BorderBrush="#D1D5DB"
+        BorderThickness="1"
+        Padding="18"
+        Opacity="0"
+        RenderTransformOrigin="0.85,1"
+        Visibility="Collapsed" Grid.ColumnSpan="2">
+
+            <Border.RenderTransform>
+                <ScaleTransform x:Name="QuickPrintPanelScale"
+                        ScaleX="0.92"
+                        ScaleY="0.92"/>
+            </Border.RenderTransform>
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24"
+                          ShadowDepth="6"
+                          Opacity="0.25"/>
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Cabecera -->
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Impresión rápida"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Foreground="#111827"/>
+
+                        <TextBlock Text="PDF, imágenes y documentos compatibles"
+                           FontSize="12"
+                           Foreground="#6B7280"
+                           Margin="0,3,0,0"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                    Content="×"
+                    Width="34"
+                    Height="34"
+                    Background="#F3F4F6"
+                    Foreground="#111827"
+                    BorderThickness="0"
+                    FontSize="18"
+                    FontWeight="Bold"
+                    Cursor=""
+                    Click="HideQuickPrintPanel_Click"/>
+                </Grid>
+
+                <!-- Línea separadora -->
+                <Border Grid.Row="1"
+                Height="1"
+                Background="#E5E7EB"
+                Margin="0,0,0,14"/>
+
+                <!-- Drop Zone -->
+                <Border x:Name="QuickPrintDropZone"
+                Grid.Row="2"
+                Background="#F9FAFB"
+                BorderBrush="#CBD5E1"
+                BorderThickness="2"
+                CornerRadius="18"
+                Padding="16"
+                Margin="0,0,0,14"
+                AllowDrop="True"
+                DragEnter="QuickPrintDropZone_DragEnter"
+                DragOver="QuickPrintDropZone_DragOver"
+                DragLeave="QuickPrintDropZone_DragLeave"
+                Drop="QuickPrintDropZone_Drop">
+
+                    <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                        <TextBlock Text="⬇"
+                           FontSize="28"
+                           Foreground="#2563EB"
+                           HorizontalAlignment="Center"/>
+
+                        <TextBlock Text="Arrastra aquí tus archivos"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           Foreground="#111827"
+                           HorizontalAlignment="Center"
+                           Margin="0,8,0,0"/>
+
+                        <TextBlock Text="En la siguiente fase activaremos la carga del archivo"
+                           FontSize="11"
+                           Foreground="#6B7280"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Archivo seleccionado -->
+                <TextBlock x:Name="QuickPrintSelectedFileText"
+                   Grid.Row="3"
+                   Text="Ningún archivo seleccionado."
+                   FontSize="12"
+                   Foreground="#6B7280"
+                   TextTrimming="CharacterEllipsis"
+                   Margin="0,0,0,12"/>
+
+                <!-- Acciones inferiores -->
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox x:Name="QuickPrintPrinterComboBox"
+                              Grid.Column="0"
+                              Height="36"
+                              Margin="0,0,10,0"
+                              VerticalContentAlignment="Center"
+                              DisplayMemberPath="DisplayName"
+                              SelectedValuePath="PrinterName"
+                              SelectionChanged="QuickPrintPrinterComboBox_SelectionChanged"
+                              IsEnabled="False"
+                              ToolTip="Selecciona la impresora de destino"/>
+
+                    <Button x:Name="QuickPrintPrintButton"
+                            Grid.Column="1"
+                            Content="Imprimir"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            IsEnabled="False"
+                            Click="QuickPrintPrintButton_Click"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Panel desplegable de generación de carteles -->
+        <Border x:Name="PosterPanel"
+                Width="720"
+                Height="740"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,198,147"
+                Background="#FAFFFFFF"
+                CornerRadius="24"
+                BorderBrush="#D1D5DB"
+                BorderThickness="1"
+                Padding="0"
+                SnapsToDevicePixels="True"
+                ClipToBounds="False"
+                Opacity="0"
+                RenderTransformOrigin="0.85,1"
+                Visibility="Collapsed" Grid.ColumnSpan="2">
+
+            <Border.RenderTransform>
+                <ScaleTransform x:Name="PosterPanelScale"
+                                ScaleX="0.92"
+                                ScaleY="0.92"/>
+            </Border.RenderTransform>
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24"
+                                  ShadowDepth="6"
+                                  Opacity="0.25"/>
+            </Border.Effect>
+
+            <Grid Margin="18,16,18,14">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Cabecera -->
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Generador de carteles"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="#111827"/>
+
+                        <TextBlock Text="Busca productos, añádelos al lote y genera carteles"
+                                   FontSize="12"
+                                   Foreground="#6B7280"
+                                   Margin="0,3,0,0"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Content="×"
+                            Width="34"
+                            Height="34"
+                            Background="#F3F4F6"
+                            Foreground="#111827"
+                            BorderThickness="0"
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Cursor="Hand"
+                            Click="HidePosterPanel_Click"/>
+                </Grid>
+
+                <!-- Separador -->
+                <Border Grid.Row="1"
+                        Height="1"
+                        Background="#E5E7EB"
+                        Margin="0,0,0,14"/>
+
+
+
+                <!-- Formulario con scroll para evitar recortes -->
+                <ScrollViewer Grid.Row="2"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              CanContentScroll="True"
+                              Margin="0,0,0,0"
+                              Padding="0,0,10,0">
+
+                    <!-- Formulario -->
+                    <Grid Margin="0,0,4,0"
+                          Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="185"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="140"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="125"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Selector de modo: Cartel / Etiqueta -->
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="0"
+                                   Text="Tipo:"
+                                   VerticalAlignment="Center"
+                                   FontSize="13"
+                                   Foreground="#374151"
+                                   Margin="0,0,10,10"/>
+
+                        <ComboBox x:Name="PosterTypeComboBox"
+                                  Grid.Row="0"
+                                  Grid.Column="1"
+                                  Height="34"
+                                  Margin="0,0,0,10"
+                                  SelectedIndex="0"
+                                  SelectionChanged="PosterTypeComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Cartel"/>
+                            <ComboBoxItem Content="Etiqueta"/>
+                        </ComboBox>
+
+                        <Grid x:Name="PosterModeContentGrid"
+                              Grid.Row="1"
+                              Grid.RowSpan="6"
+                              Grid.ColumnSpan="2">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="185"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="140"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- contenido actual de carteles -->
+                            <!-- Tamaño -->
+                            <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
+                                   Text="Tamaño:"
+                                   VerticalAlignment="Center"
+                                   FontSize="13"
+                                   Foreground="#374151"
+                                   Margin="0,0,10,10"/>
+
+                            <ComboBox x:Name="PosterSizeComboBox"
+                                  Grid.Row="1"
+                                  Grid.Column="1"
+                                  Height="34"
+                                  Margin="0,0,0,10"
+                                  SelectedIndex="1">
+                                <ComboBoxItem Content="A3"/>
+                                <ComboBoxItem Content="A4"/>
+                                <ComboBoxItem Content="A5"/>
+                                <ComboBoxItem Content="A6"/>
+                            </ComboBox>
+
+                            <!-- Tipo de oferta -->
+                            <TextBlock Grid.Row="2"
+                                   Grid.Column="0"
+                                   Text="Oferta:"
+                                   VerticalAlignment="Center"
+                                   FontSize="13"
+                                   Foreground="#374151"
+                                   Margin="0,0,10,10"/>
+
+                            <ComboBox x:Name="PosterPriceTypeComboBox"
+                                  Grid.Row="2"
+                                  Grid.Column="1"
+                                  Height="34"
+                                  Margin="0,0,0,10"
+                                  SelectedIndex="0">
+                                <ComboBoxItem Content="Normal"/>
+                                <ComboBoxItem Content="Novedad"/>
+                                <ComboBoxItem Content="Super Oferta"/>
+                                <ComboBoxItem Content="Oferta 1+1"/>
+                                <ComboBoxItem Content="Oferta 2+1"/>
+                                <ComboBoxItem Content="Oferta 3+1"/>
+                                <ComboBoxItem Content="Oferta 4+1"/>
+                                <ComboBoxItem Content="Oferta 5+1"/>
+                            </ComboBox>
+
+                            <!-- Bloque de búsqueda -->
+                            <Border Grid.Row="3"
+                                Grid.ColumnSpan="2"
+                                Background="#F9FAFB"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1"
+                                CornerRadius="14"
+                                Padding="12"
+                                Margin="0,0,0,10">
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0"
+                                           Text="Buscar producto"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#111827"
+                                           Margin="0,0,0,8"/>
+
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="140"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <ComboBox x:Name="PosterSearchTypeComboBox"
+                                              Grid.Column="0"
+                                              Height="34"
+                                              Margin="0,0,8,0"
+                                              SelectedIndex="0"
+                                              SelectionChanged="PosterSearchTypeComboBox_SelectionChanged">
+                                            <ComboBoxItem Content="EAN"/>
+                                            <ComboBoxItem Content="Código artículo"/>
+                                            <ComboBoxItem Content="Nombre"/>
+                                        </ComboBox>
+
+                                        <TextBox x:Name="PosterSearchTextBox"
+                                             Grid.Column="1"
+                                             Height="34"
+                                             VerticalContentAlignment="Center"
+                                             FontSize="14"
+                                             ToolTip="Introduce EAN, código de artículo o fragmento de nombre"
+                                             KeyDown="PosterSearchTextBox_KeyDown"/>
+
+                                        <Button x:Name="PosterSearchButton"
+                                            Grid.Column="2"
+                                            Content="Buscar"
+                                            Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                            Margin="8,0,0,0"
+                                            Click="PosterSearchButton_Click"/>
+                                    </Grid>
+
+                                    <TextBlock x:Name="PosterSearchHelpText"
+                                               Grid.Row="2"
+                                               Text="El código EAN debe tener 5, 8, 13 o 14 dígitos."
+                                               FontSize="11"
+                                               Foreground="#6B7280"
+                                               Margin="0,6,0,0"
+                                               TextWrapping="Wrap"/>
+
+                                    <ListBox x:Name="PosterSearchResultsListBox"
+                                             Grid.Row="3"
+                                             Margin="0,10,0,0"
+                                             DisplayMemberPath="DisplayText"
+                                             SelectionMode="Extended"
+                                             HorizontalContentAlignment="Stretch"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Botón añadir -->
+                            <Grid Grid.Row="4"
+                              Grid.ColumnSpan="2"
+                              Margin="0,0,0,10">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                       Text="Selecciona uno o varios resultados y añádelos al lote."
+                                       FontSize="12"
+                                       Foreground="#6B7280"
+                                       VerticalAlignment="Center"/>
+
+                                <Button x:Name="PosterAddSelectedProductsButton"
+                                    Grid.Column="1"
+                                    Content="Añadir"
+                                    Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                    Click="PosterAddSelectedProductsButton_Click"/>
+                            </Grid>
+
+                            <!-- Productos seleccionados -->
+                            <Border Grid.Row="5"
+                                Grid.ColumnSpan="2"
+                                Background="#F9FAFB"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1"
+                                CornerRadius="14"
+                                Padding="12"
+                                Margin="0,0,0,10">
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0"
+                                           Text="Artículos seleccionados"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#111827"
+                                           Margin="0,0,0,8"/>
+
+                                    <ListBox x:Name="PosterSelectedProductsListBox"
+                                         Grid.Row="1"
+                                         DisplayMemberPath="DisplayText"
+                                         SelectionMode="Extended"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Botones de gestión del lote -->
+                            <Grid Grid.Row="6"
+                                  Grid.ColumnSpan="2"
+                                  Margin="0,0,0,10">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="PosterSelectedCountText"
+                                           Grid.Column="0"
+                                           Text="Artículos seleccionados: 0"
+                                           FontSize="12"
+                                           Foreground="#6B7280"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="PosterRemoveSelectedProductsButton"
+                                        Grid.Column="1"
+                                        Content="Quitar"
+                                        Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                        Margin="0,0,8,0"
+                                        Click="PosterRemoveSelectedProductsButton_Click"/>
+
+                                <Button x:Name="PosterClearSelectedProductsButton"
+                                        Grid.Column="2"
+                                        Content="Quitar todo"
+                                        Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                        Click="PosterClearSelectedProductsButton_Click"/>
+
+                            </Grid>
+
+                        </Grid>
+                        <Grid x:Name="LabelModeContentGrid"
+                              Grid.Row="1"
+                              Grid.RowSpan="6"
+                              Grid.ColumnSpan="2"
+                              Visibility="Collapsed">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="220"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="220"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Origen y formato de etiquetas -->
+                            <Grid Grid.Row="0"
+                                  Margin="0,0,0,10">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="Origen:"
+                                           VerticalAlignment="Center"
+                                           FontSize="13"
+                                           Foreground="#374151"
+                                           Margin="0,0,10,0"/>
+
+                                <ComboBox x:Name="LabelSourceComboBox"
+                                          Grid.Column="1"
+                                          Height="34"
+                                          Margin="0,0,16,0"
+                                          SelectedIndex="0"
+                                          SelectionChanged="LabelSourceComboBox_SelectionChanged">
+                                    <ComboBoxItem Content="Pendientes"/>
+                                    <ComboBoxItem Content="Reposición"/>
+                                </ComboBox>
+
+                                <TextBlock Grid.Column="2"
+                                           Text="Formato:"
+                                           VerticalAlignment="Center"
+                                           FontSize="13"
+                                           Foreground="#374151"
+                                           Margin="0,0,10,0"/>
+
+                                <ComboBox x:Name="LabelFormatComboBox"
+                                          Grid.Column="3"
+                                          Height="34"
+                                          SelectedIndex="0">
+                                    <ComboBoxItem Content="Normal"/>
+                                    <ComboBoxItem Content="Reducido"/>
+                                    <ComboBoxItem Content="Super reducido"/>
+                                </ComboBox>
+                            </Grid>
+
+                            <!-- Cabecera / cargar pendientes -->
+                            <Grid x:Name="LabelPendingHeaderGrid"
+                                  Grid.Row="1"
+                                  Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="Etiquetas pendientes de impresión del año actual"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="#111827"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="LabelRefreshPendingButton"
+                                        Grid.Column="1"
+                                        Content="Cargar pendientes"
+                                        Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                        Click="LabelRefreshPendingButton_Click"/>
+                            </Grid>
+
+                            <!-- Búsqueda de etiquetas para reposición -->
+                            <Grid x:Name="LabelRestockSearchGrid"
+                                  Grid.Row="1"
+                                  Visibility="Collapsed"
+                                  Margin="0,0,0,10">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ComboBox x:Name="LabelSearchTypeComboBox"
+                                          Grid.Column="0"
+                                          Height="34"
+                                          Margin="0,0,8,0"
+                                          SelectedIndex="0">
+                                    <ComboBoxItem Content="EAN"/>
+                                    <ComboBoxItem Content="Código artículo"/>
+                                    <ComboBoxItem Content="Nombre"/>
+                                </ComboBox>
+
+                                <TextBox x:Name="LabelSearchTextBox"
+                                         Grid.Column="1"
+                                         Height="34"
+                                         VerticalContentAlignment="Center"
+                                         FontSize="14"
+                                         ToolTip="Introduce EAN, código de artículo o fragmento de nombre"
+                                         KeyDown="LabelSearchTextBox_KeyDown"/>
+
+                                <Button x:Name="LabelSearchButton"
+                                        Grid.Column="2"
+                                        Content="Buscar"
+                                        Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                        Margin="8,0,0,0"
+                                        Click="LabelSearchButton_Click"/>
+                            </Grid>
+
+                            <!-- Lista de pendientes / resultados de reposición -->
+                            <Border Grid.Row="2"
+                                    Background="#F9FAFB"
+                                    BorderBrush="#E5E7EB"
+                                    BorderThickness="1"
+                                    CornerRadius="14"
+                                    Padding="12"
+                                    Margin="0,0,0,10">
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0"
+                                               Text="Etiquetas disponibles"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               Margin="0,0,0,8"/>
+
+                                    <ListBox x:Name="LabelPendingListBox"
+                                             Grid.Row="1"
+                                             DisplayMemberPath="DisplayText"
+                                             SelectionMode="Extended"
+                                             HorizontalContentAlignment="Stretch"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Botón añadir etiquetas -->
+                            <Grid Grid.Row="3"
+                                  Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="Selecciona una o varias etiquetas y añádelas al lote."
+                                           FontSize="12"
+                                           Foreground="#6B7280"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="LabelAddSelectedButton"
+                                        Grid.Column="1"
+                                        Content="Añadir"
+                                        Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                        Click="LabelAddSelectedButton_Click"/>
+                            </Grid>
+
+                            <!-- Lista de etiquetas seleccionadas -->
+                            <Border Grid.Row="4"
+                                    Background="#F9FAFB"
+                                    BorderBrush="#E5E7EB"
+                                    BorderThickness="1"
+                                    CornerRadius="14"
+                                    Padding="12"
+                                    Margin="0,0,0,10">
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0"
+                                               Text="Etiquetas seleccionadas"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               Margin="0,0,0,8"/>
+
+                                    <ListBox x:Name="LabelSelectedListBox"
+                                             Grid.Row="1"
+                                             DisplayMemberPath="DisplayText"
+                                             SelectionMode="Extended"
+                                             HorizontalContentAlignment="Stretch"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Botones quitar -->
+                            <Grid Grid.Row="5"
+                                  Margin="0,0,0,10">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock x:Name="LabelSelectedCountText"
+                                           Grid.Column="0"
+                                           Text="Etiquetas seleccionadas: 0"
+                                           FontSize="12"
+                                           Foreground="#6B7280"
+                                           VerticalAlignment="Center"/>
+
+                                <Button x:Name="LabelRemoveSelectedButton"
+                                        Grid.Column="1"
+                                        Content="Quitar"
+                                        Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                        Margin="0,0,8,0"
+                                        Click="LabelRemoveSelectedButton_Click"/>
+
+                                <Button x:Name="LabelClearSelectedButton"
+                                        Grid.Column="2"
+                                        Content="Quitar todo"
+                                        Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                        Click="LabelClearSelectedButton_Click"/>
+                            </Grid>
+
+                            <!-- Fase futura: marcar como impresas -->
+                            <CheckBox x:Name="LabelMarkAsPrintedCheckBox"
+                                      Grid.Row="6"
+                                      Content="Marcar como impresas después de imprimir"
+                                      FontSize="12"
+                                      Foreground="#6B7280"
+                                      IsEnabled="True"
+                                      ToolTip="Pendiente de implementar cuando confirmemos la consulta UPDATE."
+                                      Margin="0,0,0,8"/>
+                        </Grid>
+                        <!-- Impresora -->
+                        <TextBlock Grid.Row="7"
+                               Grid.Column="0"
+                               Text="Impresora:"
+                               VerticalAlignment="Center"
+                               FontSize="13"
+                               Foreground="#374151"
+                               Margin="0,0,10,10"/>
+
+                        <ComboBox x:Name="PosterPrinterComboBox"
+                              Grid.Row="7"
+                              Grid.Column="1"
+                              Height="34"
+                              Margin="0,0,0,10"
+                              VerticalContentAlignment="Center"
+                              DisplayMemberPath="DisplayName"
+                              SelectedValuePath="PrinterName"
+                              IsEnabled="False"
+                              ToolTip="Selecciona la impresora para el cartel"/>
+
+                        <!-- Estado -->
+                        <Border Grid.Row="8"
+                            Grid.ColumnSpan="2"
+                            Background="#F9FAFB"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1"
+                            CornerRadius="14"
+                            Padding="12"
+                            Margin="0,4,0,0">
+
+                            <TextBlock x:Name="PosterStatusText"
+                                   Text="Busca productos y añádelos al listado para generar carteles."
+                                   FontSize="12"
+                                   Foreground="#6B7280"
+                                   TextWrapping="Wrap"/>
+                        </Border>
+                    </Grid>
+
+                </ScrollViewer>
+
+                <!-- Botones -->
+                <Grid Grid.Row="3" Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="PosterGenerateButton"
+                            Grid.Column="1"
+                            Content="Generar PDF"
+                            Style="{StaticResource PosterGreenHoverButtonStyle}"
+                            Margin="0,0,10,0"
+                            Click="PosterGenerateButton_Click"/>
+
+                    <Button x:Name="PosterPreviewButton"
+                            Grid.Column="2"
+                            Content="Previsualizar"
+                            Style="{StaticResource PosterGreenHoverButtonStyle}"
+                            IsEnabled="False"
+                            Margin="10,0,10,0"
+                            Click="PosterPreviewButton_Click"/>
+
+                    <Button x:Name="PosterPrintButton"
+                            Grid.Column="3"
+                            Content="Imprimir"
+                            Style="{StaticResource PosterPrintHoverButtonStyle}"
+                            IsEnabled="False"
+                            Click="PosterPrintButton_Click"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+
+        <!-- Panel de tareas y recordatorios -->
+        <Border x:Name="TasksPanel"
+                Width="720"
+                Height="850"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,185,95"
+                Background="#FAFFFFFF"
+                CornerRadius="24"
+                BorderBrush="#D1D5DB"
+                BorderThickness="1"
+                Padding="0"
+                SnapsToDevicePixels="True"
+                Visibility="Collapsed"
+                Opacity="0"
+                RenderTransformOrigin="0.85,1" Grid.ColumnSpan="2">
+
+            <Border.RenderTransform>
+                <ScaleTransform x:Name="TasksPanelScale"
+                                ScaleX="0.92"
+                                ScaleY="0.92"/>
+            </Border.RenderTransform>
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24"
+                                  ShadowDepth="6"
+                                  Opacity="0.25"/>
+            </Border.Effect>
+
+            <Grid Margin="18,16,18,14">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="390"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Cabecera -->
+                <Grid Grid.Row="0"
+                      Margin="0,0,0,12">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Tareas y recordatorios"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Foreground="#111827"/>
+
+                        <TextBlock Text="Gestión centralizada de tareas para todos los usuarios"
+                                   FontSize="12"
+                                   Foreground="#6B7280"
+                                   Margin="0,3,0,0"/>
+                    </StackPanel>
+
+                    <Button x:Name="TasksRefreshButton"
+                            Grid.Column="1"
+                            Content="Actualizar"
+                            Style="{StaticResource PosterGreenHoverButtonStyle}"
+                            Click="TasksRefreshButton_Click"/>
+                </Grid>
+
+                <!-- Mitad superior: nueva tarea -->
+                <Border Grid.Row="1"
+                        Background="#F9FAFB"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1"
+                        CornerRadius="16"
+                        Padding="14"
+                        Margin="0,0,0,12">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0"
+                                   Text="Nueva tarea / recordatorio"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Foreground="#111827"
+                                   Margin="0,0,0,10"/>
+
+                        <Grid Grid.Row="1"
+                              Margin="0,0,0,8">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Escrito por:"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="#374151"/>
+
+                            <TextBox x:Name="TaskWrittenByTextBox"
+                                     Grid.Column="1"
+                                     Height="32"
+                                     Margin="0,0,12,0"
+                                     VerticalContentAlignment="Center"/>
+
+                            <TextBlock Grid.Column="2"
+                                       Text="Dirigido a:"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="#374151"/>
+
+                            <TextBox x:Name="TaskAssignedToTextBox"
+                                     Grid.Column="3"
+                                     Height="32"
+                                     VerticalContentAlignment="Center"/>
+                        </Grid>
+
+                        <Grid Grid.Row="2"
+                              Margin="0,0,0,8">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Emisión:"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="#374151"/>
+
+                            <TextBox x:Name="TaskCreatedAtTextBox"
+                                     Grid.Column="1"
+                                     Height="32"
+                                     Margin="0,0,12,0"
+                                     IsReadOnly="True"
+                                     Background="#EEF2FF"
+                                     VerticalContentAlignment="Center"/>
+
+                            <TextBlock Grid.Column="2"
+                                       Text="Vencimiento:"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="#374151"/>
+
+                            <DatePicker x:Name="TaskDueDatePicker"
+                                        Grid.Column="3"
+                                        Height="32"/>
+                        </Grid>
+
+                        <Grid Grid.Row="3"
+                              Margin="0,0,0,8">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Grupo:"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="#374151"/>
+
+                            <ComboBox x:Name="TaskGroupComboBox"
+                                      Grid.Column="1"
+                                      Height="32"
+                                      Margin="0,0,12,0"
+                                      VerticalContentAlignment="Center"/>
+
+                            <TextBlock Grid.Column="2"
+                                       Text="Urgencia:"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="#374151"/>
+
+                            <ComboBox x:Name="TaskPriorityComboBox"
+                                      Grid.Column="3"
+                                      Height="32"
+                                      SelectedIndex="0"
+                                      VerticalContentAlignment="Center">
+                                <ComboBoxItem Content="Normal"/>
+                                <ComboBoxItem Content="Urgente"/>
+                                <ComboBoxItem Content="Muy urgente"/>
+                            </ComboBox>
+                        </Grid>
+
+                        <Grid Grid.Row="4"
+                              Margin="0,0,0,10">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Descripción:"
+                                       VerticalAlignment="Top"
+                                       FontSize="12"
+                                       Foreground="#374151"
+                                       Margin="0,4,0,0"/>
+                            <TextBox x:Name="TaskDescriptionTextBox"
+                                     Grid.Column="1"
+                                     MinHeight="80"
+                                     Height="90"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto"
+                                     VerticalContentAlignment="Top"/>
+                        </Grid>
+
+                        <Grid Grid.Row="5"
+                              Margin="0,0,0,8">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Adjuntos:"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="#374151"/>
+
+                            <TextBlock x:Name="TaskNewAttachmentsText"
+                                       Grid.Column="1"
+                                       Text="Sin archivos adjuntos."
+                                       FontSize="12"
+                                       Foreground="#6B7280"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+
+                            <Button x:Name="TaskSelectNewAttachmentsButton"
+                                    Grid.Column="2"
+                                    Content="Adjuntar"
+                                    Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                    Margin="8,0,8,0"
+                                    Click="TaskSelectNewAttachmentsButton_Click"/>
+
+                            <Button x:Name="TaskClearNewAttachmentsButton"
+                                    Grid.Column="3"
+                                    Content="Limpiar"
+                                    Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                    Click="TaskClearNewAttachmentsButton_Click"/>
+                        </Grid>
+
+                        <Grid Grid.Row="6"
+                              Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock x:Name="TasksStatusText"
+                                       Grid.Column="0"
+                                       Text="Listo."
+                                       FontSize="12"
+                                       Foreground="#6B7280"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="Wrap"/>
+
+                            <Button x:Name="TaskAddButton"
+                                    Grid.Column="1"
+                                    Content="Añadir"
+                                    Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                    Click="TaskAddButton_Click"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Separador -->
+                <TextBlock Grid.Row="2"
+                           Text="Tareas / recordatorios creados"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           Foreground="#111827"
+                           Margin="0,0,0,8"/>
+
+                <!-- Mitad inferior: listado -->
+                <Border Grid.Row="3"
+                        Background="#F9FAFB"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1"
+                        CornerRadius="16"
+                        Padding="12"
+                        Margin="0,0,0,12">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Filtros visuales -->
+                        <Grid Grid.Row="0"
+                              Margin="0,0,0,10">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Fila 1: filtros actuales -->
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       Text="Grupo:"
+                                       FontSize="12"
+                                       Foreground="#374151"
+                                       VerticalAlignment="Center"/>
+
+                            <ComboBox x:Name="TaskFilterGroupComboBox"
+                                      Grid.Row="0"
+                                      Grid.Column="1"
+                                      Height="30"
+                                      Margin="0,0,10,0"
+                                      SelectionChanged="TaskFilters_SelectionChanged"/>
+
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="2"
+                                       Text="Urgencia:"
+                                       FontSize="12"
+                                       Foreground="#374151"
+                                       VerticalAlignment="Center"/>
+
+                            <ComboBox x:Name="TaskFilterPriorityComboBox"
+                                      Grid.Row="0"
+                                      Grid.Column="3"
+                                      Height="30"
+                                      Margin="0,0,10,0"
+                                      SelectedIndex="0"
+                                      SelectionChanged="TaskFilters_SelectionChanged">
+                                <ComboBoxItem Content="Todas"/>
+                                <ComboBoxItem Content="Muy urgente"/>
+                                <ComboBoxItem Content="Urgente"/>
+                                <ComboBoxItem Content="Normal"/>
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="4"
+                                       Text="Estado:"
+                                       FontSize="12"
+                                       Foreground="#374151"
+                                       VerticalAlignment="Center"/>
+
+                            <ComboBox x:Name="TaskFilterStatusComboBox"
+                                      Grid.Row="0"
+                                      Grid.Column="5"
+                                      Height="30"
+                                      SelectedIndex="0"
+                                      SelectionChanged="TaskFilters_SelectionChanged">
+                                <ComboBoxItem Content="Todos"/>
+                                <ComboBoxItem Content="En plazo"/>
+                                <ComboBoxItem Content="Fuera de plazo"/>
+                            </ComboBox>
+
+                            <!-- Fila 2: búsqueda por dirigido a -->
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       Text="Dirigido a:"
+                                       FontSize="12"
+                                       Foreground="#374151"
+                                       VerticalAlignment="Center"
+                                       Margin="0,8,0,0"/>
+
+                            <TextBox x:Name="TaskFilterAssignedToTextBox"
+                                     Grid.Row="1"
+                                     Grid.Column="1"
+                                     Grid.ColumnSpan="5"
+                                     Height="30"
+                                     Margin="0,8,0,0"
+                                     VerticalContentAlignment="Center"
+                                     TextChanged="TaskFilterAssignedToTextBox_TextChanged"/>
+                        </Grid>
+
+                        <!-- Lista de tareas -->
+                        <ListBox x:Name="TasksListBox"
+                                 Grid.Row="1"
+                                 SelectionMode="Extended"
+                                 MouseDoubleClick="TasksListBox_MouseDoubleClick"
+                                 HorizontalContentAlignment="Stretch"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" Cursor="">
+
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderBrush" Value="Transparent"/>
+                                        </Trigger>
+
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="10"
+                                            Padding="10"
+                                            Margin="0,0,0,8"
+                                            BorderThickness="2"
+                                            BorderBrush="#111827">
+
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+
+                                                <!-- Normal en plazo: azul más intenso -->
+                                                <Setter Property="Background" Value="#60A5FA"/>
+                                                <Setter Property="BorderBrush" Value="#111827"/>
+                                                <Setter Property="BorderThickness" Value="2"/>
+
+                                                <Style.Triggers>
+
+                                                    <!-- Urgente en plazo: naranja más intenso -->
+                                                    <DataTrigger Binding="{Binding Priority}" Value="Urgente">
+                                                        <Setter Property="Background" Value="#FB923C"/>
+                                                    </DataTrigger>
+
+                                                    <!-- Muy urgente en plazo: rojo intenso -->
+                                                    <DataTrigger Binding="{Binding Priority}" Value="MuyUrgente">
+                                                        <Setter Property="Background" Value="#EF4444"/>
+                                                    </DataTrigger>
+
+                                                    <!-- Fuera de plazo domina sobre cualquier prioridad -->
+                                                    <DataTrigger Binding="{Binding IsExpired}" Value="True">
+                                                        <Setter Property="Background" Value="Black"/>
+                                                        <Setter Property="BorderBrush" Value="Gray"/>
+                                                        <Setter Property="BorderThickness" Value="3"/>
+                                                    </DataTrigger>
+
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Línea principal -->
+                                            <TextBlock Grid.Row="0"
+                                                       Grid.Column="0"
+                                                       Text="{Binding DisplayText, Mode=OneWay}"
+                                                       FontSize="13"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="White"
+                                                       TextTrimming="CharacterEllipsis"/>
+
+                                            <TextBlock Grid.Row="0"
+                                                       Grid.Column="1"
+                                                       Text="{Binding StatusText, Mode=OneWay}"
+                                                       FontSize="12"
+                                                       FontWeight="Bold"
+                                                       Foreground="White"
+                                                       Margin="12,0,0,0"/>
+
+                                            <!-- Información secundaria -->
+                                            <StackPanel Grid.Row="1"
+                                                        Grid.ColumnSpan="2"
+                                                        Orientation="Vertical"
+                                                        Margin="0,4,0,0">
+
+                                                <TextBlock Text="{Binding WrittenBy, StringFormat=Escrito por: {0}, Mode=OneWay}"
+                                                           FontSize="11"
+                                                           Foreground="White"/>
+
+                                                <TextBlock FontSize="11"
+                                                           Foreground="White">
+                                                    <Run Text="Grupo: "/>
+                                                    <Run Text="{Binding GroupDisplayName, Mode=OneWay}"/>
+                                                    <Run Text=" · Urgencia: "/>
+                                                    <Run Text="{Binding PriorityDisplayText, Mode=OneWay}"/>
+                                                    <Run Text=" · "/>
+                                                    <Run Text="{Binding AttachmentCountText, Mode=OneWay}"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+
+                <!-- Botones inferiores -->
+                <Grid Grid.Row="4">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Azul: normal · Naranja: urgente · Rojo: muy urgente · Negro: fuera de plazo"
+                               Grid.Column="0"
+                               FontSize="11"
+                               Foreground="#6B7280"
+                               VerticalAlignment="Center"/>
+
+                    <Button x:Name="TaskShowButton"
+                            Grid.Column="1"
+                            Content="Mostrar"
+                            Style="{StaticResource PosterGreenHoverButtonStyle}"
+                            Margin="0,0,8,0"
+                            Click="TaskShowButton_Click"/>
+
+                    <Button x:Name="TaskDeleteButton"
+                            Grid.Column="2"
+                            Content="Quitar"
+                            Style="{StaticResource PosterGreenHoverButtonStyle}"
+                            Click="TaskDeleteButton_Click" Cursor="Hand"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Panel emergente de detalle de tarea -->
+        <Border x:Name="TaskDetailPanel"
+                Width="460"
+                Height="360"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,250,310"
+                Background="#FFFFFFFF"
+                CornerRadius="22"
+                BorderBrush="#D1D5DB"
+                BorderThickness="1"
+                Padding="18"
+                Visibility="Collapsed"
+                Opacity="0"
+                RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2">
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24"
+                                  ShadowDepth="6"
+                                  Opacity="0.25"/>
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0"
+                      Margin="0,0,0,12">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Detalle de tarea"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#111827"
+                               VerticalAlignment="Center"/>
+
+                    <Button x:Name="TaskDetailCloseButton"
+                            Grid.Column="1"
+                            Width="28"
+                            Height="28"
+                            Content="X"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Background="#DC2626"
+                            BorderBrush="#991B1B"
+                            BorderThickness="1"
+                            Click="TaskDetailCloseButton_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="14">
+                                    <ContentPresenter HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto">
+
+                    <StackPanel>
+
+                        <TextBlock Text="Escrito por"
+                                   FontWeight="SemiBold"
+                                   Foreground="#374151"/>
+                        <TextBlock x:Name="TaskDetailWrittenByText"
+                                   Margin="0,2,0,10"
+                                   TextWrapping="Wrap"/>
+
+                        <TextBlock Text="Dirigido a"
+                                   FontWeight="SemiBold"
+                                   Foreground="#374151"/>
+                        <TextBlock x:Name="TaskDetailAssignedToText"
+                                   Margin="0,2,0,10"
+                                   TextWrapping="Wrap"/>
+
+                        <TextBlock Text="Fecha emisión"
+                                   FontWeight="SemiBold"
+                                   Foreground="#374151"/>
+                        <TextBlock x:Name="TaskDetailCreatedAtText"
+                                   Margin="0,2,0,10"
+                                   TextWrapping="Wrap"/>
+
+                        <TextBlock Text="Fecha vencimiento"
+                                   FontWeight="SemiBold"
+                                   Foreground="#374151"/>
+                        <TextBlock x:Name="TaskDetailDueAtText"
+                                   Margin="0,2,0,10"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="Nueva fecha límite"
+                                   FontWeight="SemiBold"
+                                   Foreground="#374151"/>
+
+                        <Grid Margin="0,2,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <DatePicker x:Name="TaskDetailNewDueDatePicker"
+                                        Grid.Column="0"
+                                        Height="32"
+                                        Margin="0,0,8,0"/>
+
+                            <Button x:Name="TaskPostponeButton"
+                                    Grid.Column="1"
+                                    Content="Aplazar fecha"
+                                    Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                    Click="TaskPostponeButton_Click"/>
+                        </Grid>
+                        <TextBlock Text="Grupo"
+                                   FontWeight="SemiBold"
+                                   Foreground="#374151"/>
+                        <TextBlock x:Name="TaskDetailGroupText"
+                                   Margin="0,2,0,10"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="Urgencia"
+                                   FontWeight="SemiBold"
+                                   Foreground="#374151"/>
+                        <TextBlock x:Name="TaskDetailPriorityText"
+                                   Margin="0,2,0,10"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="Descripción"
+                                   FontWeight="SemiBold"
+                                   Foreground="#374151"/>
+
+                        <TextBlock x:Name="TaskDetailDescriptionText"
+                                   Margin="0,2,0,8"
+                                   TextWrapping="Wrap"/>
+
+                        <TextBox x:Name="TaskDetailDescriptionEditTextBox"
+                                 Margin="0,2,0,8"
+                                 MinHeight="90"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Visibility="Collapsed"/>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="TaskEditDescriptionButton"
+                                    Grid.Column="1"
+                                    Content="Editar descripción"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    Click="TaskEditDescriptionButton_Click"/>
+
+                            <Button x:Name="TaskSaveDescriptionButton"
+                                    Grid.Column="2"
+                                    Content="Guardar"
+                                    Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    Visibility="Collapsed"
+                                    Click="TaskSaveDescriptionButton_Click"/>
+
+                            <Button x:Name="TaskCancelDescriptionEditButton"
+                                    Grid.Column="3"
+                                    Content="Cancelar"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Visibility="Collapsed"
+                                    Click="TaskCancelDescriptionEditButton_Click"/>
+                        </Grid>
+                        <TextBlock Text="Archivos adjuntos"
+                                   FontWeight="SemiBold"
+                                   Foreground="#374151"
+                                   Margin="0,8,0,0"/>
+
+                        <ListBox x:Name="TaskAttachmentsListBox"
+                                 Height="90"
+                                 Margin="0,4,0,8"
+                                 DisplayMemberPath="DisplayText"
+                                 SelectionMode="Single"/>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="TaskUploadAttachmentButton"
+                                    Grid.Column="1"
+                                    Content="Adjuntar archivo"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    Click="TaskUploadAttachmentButton_Click"/>
+
+                            <Button x:Name="TaskDownloadAttachmentButton"
+                                    Grid.Column="2"
+                                    Content="Descargar"
+                                    Style="{StaticResource PosterGreenHoverButtonStyle}"
+                                    Click="TaskDownloadAttachmentButton_Click"/>
+                            <Button x:Name="TaskDeleteAttachmentButton"
+                                    Grid.Column="3"
+                                    Content="Eliminar"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="8,0,0,0"
+                                    Click="TaskDeleteAttachmentButton_Click"/>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+
+
+        <!-- BOTONES -->
+        <!--
+            Cuanto mayor sea el tercer número, más a la izquierda se mueve.
+            Cuanto mayor sea el cuarto número, más arriba se mueve.
+        -->
+        <!-- Botón flotante superior para el generador de carteles -->
+        <Button x:Name="PosterToggleButton"
+        Content="🏷"
+        Style="{StaticResource FloatingCircleButtonStyle}"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Margin="0,0,135,95"
+        ToolTip="Generador de carteles"
+        Click="PosterToggleButton_Click" Cursor="" Grid.Column="1"/>
+
+        <!-- Botón flotante inferior para impresión rápida -->
+        <Button x:Name="QuickPrintToggleButton"
+        Content="🖨"
+        Style="{StaticResource FloatingCircleButtonStyle}"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Margin="0,0,148,30"
+        ToolTip="Impresión rápida"
+        Click="QuickPrintToggleButton_Click" Grid.Column="1"/>
+
+
+        <!-- Botón flotante para tareas y recordatorios -->
+        <Button x:Name="FloatingTasksButton"
+        Width="55"
+        Height="52"
+        Content="📅"
+        FontSize="20"
+        FontWeight="Bold"
+        Foreground="White"
+        Background="#2563EB"
+        BorderBrush="#1D4ED8"
+        BorderThickness="1"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Margin="0,0,80,142"
+        Cursor="Hand"
+        ToolTip="Tareas y recordatorios"
+        Click="FloatingTasksButton_Click" Grid.Column="1">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="23">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+
+        <!-- Botón flotante superior para minimizar la aplicacion-->
+        <Button x:Name="FloatingHideButton"
+        Width="26"
+        Height="26"
+        Content="X"
+        FontSize="12"
+        FontWeight="Bold"
+        Foreground="White"
+        Background="#DC2626"
+        BorderBrush="#991B1B"
+        BorderThickness="1"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Margin="0,0,16,134"
+        Cursor="Hand"
+        ToolTip="Ocultar aplicación"
+        Click="FloatingHideButton_Click" Grid.Column="1">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="13">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+
+        <!-- Avatar flotante principal -->
+        <Border x:Name="AvatarBorder"
+                Width="118"
+                Height="118"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,0,16,16"
+                Background="#FFFFFF"
+                CornerRadius="64"
+                BorderBrush="#22C55E"
+                BorderThickness="3"
+                ToolTip="Haz clic para consultar al Asistente "
+                RenderTransformOrigin="0.5,0.5"
+                MouseEnter="Avatar_MouseEnter"
+                MouseLeave="Avatar_MouseLeave"
+                MouseLeftButtonDown="Avatar_MouseLeftButtonDown" Grid.Column="1">
+
+            <Border.RenderTransform>
+                <ScaleTransform x:Name="AvatarScale"
+                    ScaleX="1"
+                    ScaleY="1"/>
+            </Border.RenderTransform>
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="22"
+                                  ShadowDepth="5"
+                                  Opacity="0.28"/>
+            </Border.Effect>
+
+            <Grid>
+                <Ellipse x:Name="AvatarGlow"
+                         Fill="#EFF6FF"
+                         Margin="8"/>
+
+                <Image Source="/Assets/avatar.png"
+                       Stretch="Uniform"
+                       Margin="0,-5,2,-5"/>
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>
