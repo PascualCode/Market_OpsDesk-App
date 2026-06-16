@@ -32,7 +32,8 @@ Herramienta especializada para la creación, organización e impresión de carte
 
 #### Captura
 
-![Carteles y etiquetas](images/carteles-etiquetas.png)
+![Carteles](images/carteles.png)
+![Etiquetas](images/etiquetas.png)
 
 ---
 
